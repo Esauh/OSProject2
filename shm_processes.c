@@ -80,22 +80,24 @@ int  main(int  argc, char *argv[]) {
 }
 
 void  ChildProcess(int sharedMem[], sem_t* mutex, int id) {
-  int account, randBal;
+  int randombalance;
+  int acc;
+   
   srand(getpid());
   for (int i=0; i<5; i++) {
     sleep(rand()%6);
     printf("Poor Student #%d: Attempting to Check Balance\n", id);
     sem_wait(mutex);
-		account = sharedMem[0];
-    randBal = rand() % 51;
-    printf("Poor Student #%d needs $%d\n", id, randBal);
+		acc = sharedMem[0];
+    randombalance = rand() % 51;
+    printf("Poor Student #%d needs $%d\n", id, randombalance);
     if (rand()%2 == 0) {
-      if (randBal <= account) {
-        account -= randBal;
-        printf("Poor Student #%d: Withdraws $%d / Balance = $%d\n", id, randBal, account);
-        sharedMem[0] = account;
+      if (randombalance <= acc) {
+        acc -= randombalance;
+        printf("Poor Student #%d: Withdraws $%d / Balance = $%d\n", id, randombalance, acc);
+        sharedMem[0] = acc;
       } else {
-        printf("Poor Student #%d: Not Enough Cash ($%d)\n", id, account);
+        printf("Poor Student #%d: Not Enough Cash ($%d)\n", id, acc);
       }
     }
     sem_post(mutex);
@@ -104,46 +106,50 @@ void  ChildProcess(int sharedMem[], sem_t* mutex, int id) {
 
 
 void DadProcess(int sharedMem[], sem_t* mutex) {
-  int account, randBal;
+  int acc; 
+  int randombalance;
   srand(getpid());
 
   for (int i=0; i<5; i++) {
     sleep(rand()%6);
     printf("Dear Old Dad: Attempting to Check Balance\n");
+
     sem_wait(mutex);
-    account = sharedMem[0];
-    if (account <= 100) {
-      randBal = rand()%101;
-      if (randBal % 2) {
-        account += randBal;
-        printf("Dear old Dad: Deposits $%d / Balance = $%d\n", randBal, account);
-        sharedMem[0] = account;
+    acc = sharedMem[0];
+    if (acc <= 100) {
+      randombalance = rand()%101;
+      if (randombalance % 2) {
+        acc = acc + randombalance;
+        printf("Dear old Dad: Deposits $%d / Balance = $%d\n", randombalance, acc);
+        sharedMem[0] = acc;
       } else {
         printf("Dear old Dad: Doesn't have any money to give\n");
       }
     } else {
-      printf("Dear old Dad: Thinks Student has enough Cash ($%d)\n", account);
+      printf("Dear old Dad: Thinks Student has enough Cash ($%d)\n", acc);
     }
     sem_post(mutex);
   }
 }
 
 void MomProcess(int sharedMem[], sem_t* mutex) {
-  int account, randBal;
+  int acc;
+  int randombalance;
+
   srand(getpid());
 
   for (int i=0; i<5; i++) {
     sleep(rand()%10);
     printf("Loveable Mom: Attempting to Check Balance\n");
     sem_wait(mutex);
-    account = sharedMem[0];
-    if (account <= 100) {
-      randBal = rand()%126;
-      account += randBal;
-      printf("Lovable Mom: Deposits $%d / Balance = $%d\n", randBal, account);
-      sharedMem[0] = account;
+    acc = sharedMem[0];
+    if (acc <= 100) {
+      randombalance = rand()%126;
+      acc = acc + randombalance;
+      printf("Lovable Mom: Deposits $%d / Balance = $%d\n", randombalance, acc);
+      sharedMem[0] = acc;
     } else {
-      printf("Lovable Mom: Thinks Student has enough Cash ($%d)\n", account);
+      printf("Lovable Mom: Thinks Student has enough Cash ($%d)\n", acc);
     }
     sem_post(mutex);
   }
